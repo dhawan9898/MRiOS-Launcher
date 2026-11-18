@@ -55,16 +55,13 @@ cd android
 | Workflow | Runs on | Does |
 |---|---|---|
 | [Android CI](.github/workflows/android-ci.yml) | every push and pull request that touches `android/` | builds the debug APK, runs lint, and attaches both to the run |
-| [Release APK](.github/workflows/android-release.yml) | a pushed `v*` tag, or a manual run | builds a signed release APK and publishes it with a checksum on the [Releases page](https://github.com/dhawan9898/MRiOS-Launcher/releases) |
+| [Release APK](.github/workflows/android-release.yml) | every push to `main` that changes the app, a pushed `v*` tag, or a manual run | builds a signed release APK and publishes it with a checksum on the [Releases page](https://github.com/dhawan9898/MRiOS-Launcher/releases) |
 
-**To publish a release:**
+**Releases are automatic.** Every push to `main` that changes the app (`android/` or the release workflow) publishes the next version: v1.0 → v1.1 → v1.2 … The version name follows the tag, and the version code increases with every run, so phones accept each release as an update.
 
-```bash
-git tag v1.1
-git push origin v1.1
-```
-
-The version name comes from the tag (`v1.1` → `1.1`). The version code increases with every run, so phones accept each release as an update. You can also go to **Actions → Release APK → Run workflow** and enter a tag.
+- To skip a release, put `[skip release]` in the commit message.
+- To bump the major version, push a tag (`git tag v2.0 && git push origin v2.0`); automatic releases then continue from v2.1.
+- You can also run **Actions → Release APK → Run workflow**. Leave the tag empty for the next version.
 
 **One-time setup:** the release workflow signs with your own key, stored as repository secrets. Phones only accept an update if it's signed with the same key as the installed version, so keep the keystore and password backed up.
 
