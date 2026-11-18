@@ -43,6 +43,10 @@ class SettingsStore(context: Context) {
                 language = enumOr(o.optString("language"), d.language),
                 hiddenPinHash = o.optString("pin").ifEmpty { null },
                 onboardingDone = o.optBoolean("onboarded", false),
+                iconStyle = enumOr(o.optString("iconStyle"), d.iconStyle),
+                iconTint = o.optInt("iconTint", d.iconTint).coerceIn(0, IconTints.lastIndex),
+                edgeNotifications = o.optBoolean("edgeNotif", d.edgeNotifications),
+                edgeControlCenter = o.optBoolean("edgeControl", d.edgeControlCenter),
             )
         }.getOrDefault(Settings())
     }
@@ -62,6 +66,10 @@ class SettingsStore(context: Context) {
             .put("language", s.language.name)
             .put("pin", s.hiddenPinHash ?: "")
             .put("onboarded", s.onboardingDone)
+            .put("iconStyle", s.iconStyle.name)
+            .put("iconTint", s.iconTint)
+            .put("edgeNotif", s.edgeNotifications)
+            .put("edgeControl", s.edgeControlCenter)
         s.weatherPlace?.let {
             o.put("place", JSONObject().put("name", it.name).put("lat", it.latitude).put("lon", it.longitude))
         }

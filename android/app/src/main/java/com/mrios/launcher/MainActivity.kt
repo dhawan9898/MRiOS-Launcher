@@ -58,6 +58,8 @@ class MainActivity : FragmentActivity() {
     override fun onResume() {
         super.onResume()
         vm.onResume()
+        com.mrios.launcher.system.PanelService.hide() // Home pressed while a panel was open over another app
+
     }
 
     @Deprecated("Deprecated in Java")

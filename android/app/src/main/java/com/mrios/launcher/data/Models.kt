@@ -58,6 +58,24 @@ enum class WidgetType(@StringRes val title: Int) {
 }
 enum class AppLanguage(val tag: String?) { SYSTEM(null), ENGLISH("en"), HINDI("hi") }
 
+/** How app icons are drawn. GLASS adds a specular sheen; CLEAR/TINTED show a glyph on a glass tile. */
+enum class IconStyle(@StringRes val title: Int) {
+    ORIGINAL(R.string.icon_style_original),
+    GLASS(R.string.icon_style_glass),
+    CLEAR(R.string.icon_style_clear),
+    TINTED(R.string.icon_style_tinted),
+}
+
+/** Tint colours for the TINTED icon style (ARGB). */
+val IconTints: List<Pair<Int, Long>> = listOf(
+    R.string.tint_gold to 0xFFFFD27A,
+    R.string.tint_blue to 0xFF7CC4FF,
+    R.string.tint_pink to 0xFFFF9AD2,
+    R.string.tint_green to 0xFF8BE8A8,
+    R.string.tint_purple to 0xFFC9B2FF,
+    R.string.tint_white to 0xFFFFFFFF,
+)
+
 data class WeatherPlace(val name: String, val latitude: Double, val longitude: Double)
 
 data class Settings(
@@ -75,6 +93,10 @@ data class Settings(
     val language: AppLanguage = AppLanguage.SYSTEM,
     val hiddenPinHash: String? = null,
     val onboardingDone: Boolean = false,
+    val iconStyle: IconStyle = IconStyle.GLASS,
+    val iconTint: Int = 0,
+    val edgeNotifications: Boolean = true,
+    val edgeControlCenter: Boolean = true,
 ) {
     /** Rows on the first home page taken up by widgets (widgets are 2x2 each). */
     val widgetRows: Int get() = if (homeWidgets.isEmpty()) 0 else 2

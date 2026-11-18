@@ -24,6 +24,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.GridView
@@ -71,6 +75,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.mrios.launcher.BuildConfigInfo
 import com.mrios.launcher.R
+import com.mrios.launcher.launcherApp
 import com.mrios.launcher.badges.BadgeListenerService
 import com.mrios.launcher.data.AppLanguage
 import com.mrios.launcher.data.SwipeDownAction
@@ -100,7 +105,10 @@ class SettingsHost(
     val recreate: () -> Unit,
     val unlock: (onUnlocked: () -> Unit) -> Unit,
     val changePin: () -> Unit,
+    val openPanels: () -> Unit,
 )
+
+private data class PanelAccess(val service: Boolean, val writeSettings: Boolean, val dnd: Boolean)
 
 private enum class Page { MAIN, ICON_PACK, WIDGETS, WEATHER, HIDDEN }
 
@@ -119,6 +127,11 @@ fun SettingsScreen(vm: LauncherViewModel, host: SettingsHost, startOnWeather: Bo
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
     val isDefault = remember(lifecycleState) { SystemActions.isDefaultLauncher(context) }
     val badgeAccess = remember(lifecycleState) { BadgeListenerService.isEnabled(context) }
+    val panelsOn = remember(lifecycleState) { com.mrios.launcher.system.PanelService.isEnabled(context) }
+    val writeAccess = remember(lifecycleState) { android.provider.Settings.System.canWrite(context) }
+    val dndAccess = remember(lifecycleState) {
+        context.getSystemService(android.app.NotificationManager::class.java).isNotificationPolicyAccessGranted
+    }
 
     BackHandler { if (choice != null) choice = null else if (page != Page.MAIN) page = Page.MAIN else onDismiss() }
 
@@ -142,7 +155,7 @@ fun SettingsScreen(vm: LauncherViewModel, host: SettingsHost, startOnWeather: Bo
             }
             Text(stringResource(title), color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp))
             when (page) {
-                Page.MAIN -> MainPage(vm, host, s, wallpaper?.isCustom == true, isDefault, badgeAccess, { page = it }, { choice = it })
+                Page.MAIN -> MainPage(vm, host, s, wallpaper?.isCustom == true, isDefault, badgeAccess, PanelAccess(panelsOn, writeAccess, dndAccess), { page = it }, { choice = it })
                 Page.ICON_PACK -> IconPackPage(vm, s.iconPack)
                 Page.WIDGETS -> WidgetsPage(vm, s.homeWidgets)
                 Page.WEATHER -> WeatherPage(vm, host, s.weatherPlace) { page = Page.MAIN }
@@ -239,8 +252,13 @@ private val listPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 40.
 @Composable
 private fun MainPage(
     vm: LauncherViewModel, host: SettingsHost, s: com.mrios.launcher.data.Settings, customWallpaper: Boolean,
-    isDefault: Boolean, badgeAccess: Boolean, go: (Page) -> Unit, choose: (Choice<*>) -> Unit,
+    isDefault: Boolean, badgeAccess: Boolean, access: PanelAccess, go: (Page) -> Unit, choose: (Choice<*>) -> Unit,
 ) {
+    val context = LocalContext.current
+    val styleLabels = com.mrios.launcher.data.IconStyle.entries.map { it to stringResource(it.title) }
+    val tintLabels = com.mrios.launcher.data.IconTints.mapIndexed { i, (name, _) -> i to stringResource(name) }
+    val allowed = stringResource(R.string.access_granted)
+    val allow = stringResource(R.string.access_needed)
     val themeLabels = listOf(ThemeMode.GLASS to stringResource(R.string.theme_glass), ThemeMode.TRANSPARENT to stringResource(R.string.theme_transparent))
     val swipeLabels = listOf(SwipeDownAction.SEARCH to stringResource(R.string.swipe_search), SwipeDownAction.NOTIFICATIONS to stringResource(R.string.swipe_notifications))
     val langLabels = listOf(AppLanguage.SYSTEM to stringResource(R.string.lang_system), AppLanguage.ENGLISH to "English", AppLanguage.HINDI to "हिन्दी")
@@ -264,6 +282,12 @@ private fun MainPage(
             } }
             add { SRow(stringResource(R.string.wallpaper), Icons.Filled.Wallpaper, Color(0xFF32ADE6), onClick = host.pickWallpaper) }
             if (customWallpaper) add { SRow(stringResource(R.string.wallpaper_reset), Icons.Filled.Wallpaper, Color(0xFF8E8E93), chevron = false) { vm.resetWallpaper() } }
+            add { SRow(stringResource(R.string.icon_style), Icons.Filled.AutoAwesome, Color(0xFF64D2FF), styleLabels.first { it.first == s.iconStyle }.second) {
+                choose(Choice(R.string.icon_style, styleLabels, s.iconStyle) { v -> vm.updateSettings { it.copy(iconStyle = v) } })
+            } }
+            if (s.iconStyle == com.mrios.launcher.data.IconStyle.TINTED) add { SRow(stringResource(R.string.icon_tint), Icons.Filled.Palette, Color(0xFFFF9F0A), tintLabels[s.iconTint].second) {
+                choose(Choice(R.string.icon_tint, tintLabels, s.iconTint) { v -> vm.updateSettings { it.copy(iconTint = v) } })
+            } }
             add { SRow(stringResource(R.string.icon_pack), Icons.Filled.Interests, IOSColors.Orange, packName ?: systemIcons) { go(Page.ICON_PACK) } }
             add { ToggleRow(stringResource(R.string.show_labels), Icons.Filled.TextFields, Color(0xFF8E8E93), s.showLabels) { v -> vm.updateSettings { it.copy(showLabels = v) } } }
         })
@@ -285,6 +309,20 @@ private fun MainPage(
             { SRow(stringResource(R.string.temp_unit), Icons.Filled.Thermostat, IOSColors.Red, unitLabels.first { it.first == s.celsius }.second) {
                 choose(Choice(R.string.temp_unit, unitLabels, s.celsius) { v -> vm.updateSettings { it.copy(celsius = v) } })
             } },
+        ))
+        group(R.string.sec_panels, listOf(
+            { SRow(stringResource(R.string.panels_all_apps), Icons.Filled.Tune, Color(0xFF5E5CE6), if (access.service) allowed else allow,
+                subtitle = stringResource(R.string.panels_all_apps_desc), onClick = host.openPanels) },
+            { SRow(stringResource(R.string.notif_access), Icons.Filled.Notifications, IOSColors.Red, if (badgeAccess) allowed else allow,
+                subtitle = stringResource(R.string.notif_access_desc)) { SystemActions.openNotificationAccess(context) } },
+            { SRow(stringResource(R.string.write_settings_access), Icons.Filled.WbSunny, IOSColors.Blue, if (access.writeSettings) allowed else allow) {
+                context.launcherApp.controls.openWriteSettings()
+            } },
+            { SRow(stringResource(R.string.dnd_access), Icons.Filled.DarkMode, Color(0xFF5E5CE6), if (access.dnd) allowed else allow) {
+                context.launcherApp.controls.openFocusAccess()
+            } },
+            { ToggleRow(stringResource(R.string.edge_notifications), Icons.Filled.SwipeDown, Color(0xFF8E8E93), s.edgeNotifications) { v -> vm.updateSettings { it.copy(edgeNotifications = v) } } },
+            { ToggleRow(stringResource(R.string.edge_control), Icons.Filled.SwipeDown, Color(0xFF8E8E93), s.edgeControlCenter) { v -> vm.updateSettings { it.copy(edgeControlCenter = v) } } },
         ))
         group(R.string.sec_notifications, listOf {
             ToggleRow(

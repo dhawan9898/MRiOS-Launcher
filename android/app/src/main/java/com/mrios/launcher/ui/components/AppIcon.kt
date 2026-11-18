@@ -27,6 +27,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
+import com.mrios.launcher.data.IconStyle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -65,12 +73,82 @@ fun rememberAppIcon(entry: AppEntry): ImageBitmap? {
     return state
 }
 
+/** Icon style + tint, provided at the root of every screen that draws icons. */
+data class IconAppearance(val style: IconStyle = IconStyle.GLASS, val tint: Color = Color(0xFFFFD27A))
+
+val LocalIconAppearance = compositionLocalOf { IconAppearance() }
+
+fun com.mrios.launcher.data.Settings.iconAppearance() =
+    IconAppearance(iconStyle, Color(com.mrios.launcher.data.IconTints[iconTint.coerceIn(0, com.mrios.launcher.data.IconTints.lastIndex)].second))
+
+@Composable
+fun rememberAppGlyph(entry: AppEntry): ImageBitmap? {
+    val loader = LocalContext.current.launcherApp.icons
+    val version by loader.version.collectAsState()
+    val state by produceState(loader.cachedGlyph(entry), entry.id, version) { value = loader.loadGlyph(entry) }
+    return state
+}
+
+/**
+ * Liquid-glass finish drawn over an icon: a specular sheen from the top, a soft lens highlight
+ * and a bright rim, all clipped to the squircle.
+ */
+fun Modifier.glassIconFinish(strength: Float = 1f): Modifier = drawWithCache {
+    val path = (SquircleShape.createOutline(size, layoutDirection, this) as Outline.Generic).path
+    val sheen = Brush.verticalGradient(
+        0f to Color.White.copy(alpha = 0.42f * strength),
+        0.36f to Color.White.copy(alpha = 0.10f * strength),
+        0.52f to Color.Transparent,
+        1f to Color.Black.copy(alpha = 0.16f * strength),
+    )
+    val lens = Brush.radialGradient(
+        listOf(Color.White.copy(alpha = 0.38f * strength), Color.Transparent),
+        center = Offset(size.width * 0.30f, size.height * 0.16f),
+        radius = size.width * 0.42f,
+    )
+    val rim = Brush.linearGradient(
+        listOf(Color.White.copy(alpha = 0.90f * strength), Color.White.copy(alpha = 0.12f * strength), Color.White.copy(alpha = 0.55f * strength)),
+        start = Offset.Zero, end = Offset(size.width, size.height),
+    )
+    val stroke = Stroke(width = size.minDimension * 0.024f)
+    onDrawWithContent {
+        drawContent()
+        clipPath(path) {
+            drawRect(sheen)
+            drawRect(lens)
+        }
+        drawPath(path, rim, style = stroke)
+    }
+}
+
 @Composable
 fun AppIcon(entry: AppEntry, size: Dp, modifier: Modifier = Modifier) {
-    val bmp = rememberAppIcon(entry)
-    Box(modifier.size(size)) {
-        if (bmp != null) Image(bmp, contentDescription = entry.label, modifier = Modifier.fillMaxSize(), filterQuality = FilterQuality.Medium)
-        else Box(Modifier.fillMaxSize().clip(SquircleShape).background(Color.White.copy(alpha = 0.2f)))
+    val look = LocalIconAppearance.current
+    when (look.style) {
+        IconStyle.ORIGINAL, IconStyle.GLASS -> {
+            val bmp = rememberAppIcon(entry)
+            Box(modifier.size(size).let { if (look.style == IconStyle.GLASS) it.glassIconFinish() else it }) {
+                if (bmp != null) Image(bmp, contentDescription = entry.label, modifier = Modifier.fillMaxSize(), filterQuality = FilterQuality.Medium)
+                else Box(Modifier.fillMaxSize().clip(SquircleShape).background(Color.White.copy(alpha = 0.2f)))
+            }
+        }
+        IconStyle.CLEAR, IconStyle.TINTED -> {
+            val glyph = rememberAppGlyph(entry)
+            val clear = look.style == IconStyle.CLEAR
+            Box(
+                modifier
+                    .size(size)
+                    .glass(SquircleShape, tint = if (clear) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.38f), rim = 0.6f)
+                    .glassIconFinish(if (clear) 0.8f else 0.55f),
+            ) {
+                if (glyph != null) Image(
+                    glyph, contentDescription = entry.label,
+                    modifier = Modifier.fillMaxSize(),
+                    filterQuality = FilterQuality.Medium,
+                    colorFilter = ColorFilter.tint(if (clear) Color.White.copy(alpha = 0.95f) else look.tint),
+                )
+            }
+        }
     }
 }
 

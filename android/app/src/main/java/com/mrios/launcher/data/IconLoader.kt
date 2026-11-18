@@ -65,6 +65,7 @@ class IconLoader(
 
     fun invalidate() {
         cache.evictAll()
+        glyphCache.evictAll()
         packs.clear()
         _version.value++
     }
@@ -73,6 +74,80 @@ class IconLoader(
         "${entry.id}|${layout.value.customIcons[entry.id]}|${settings.value.iconPack}"
 
     fun cached(entry: AppEntry): ImageBitmap? = cache.get(keyFor(entry))
+
+    // ------------------------------------------------------------------ glyphs (Clear / Tinted icon styles)
+
+    private val glyphCache = LruCache<String, ImageBitmap>(500)
+
+    fun cachedGlyph(entry: AppEntry): ImageBitmap? = glyphCache.get(keyFor(entry))
+
+    /** A white, alpha-only silhouette of the app's logo, positioned like the full icon. */
+    suspend fun loadGlyph(entry: AppEntry): ImageBitmap {
+        val key = keyFor(entry)
+        glyphCache.get(key)?.let { return it }
+        return withContext(Dispatchers.Default) {
+            val bmp = runCatching { glyph(entry) }.getOrElse { Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888) }
+                .asImageBitmap()
+            glyphCache.put(key, bmp)
+            bmp
+        }
+    }
+
+    private fun glyph(entry: AppEntry): Bitmap {
+        val custom = layout.value.customIcons[entry.id] != null
+        val pack = settings.value.iconPack?.let { packs.iconFor(it, entry.key.component) } != null
+        if (custom || pack) return whiten(contrastMask(render(entry)))
+        val d = repo.launcherActivityInfo(entry)?.getIcon(density) ?: context.packageManager.defaultActivityIcon
+        if (d is AdaptiveIconDrawable) {
+            val inset = (size * 0.25f).toInt()
+            val b = Rect(-inset, -inset, size + inset, size + inset)
+            // Android 13+ apps can ship a dedicated monochrome layer — exactly what we want.
+            if (android.os.Build.VERSION.SDK_INT >= 33) d.monochrome?.let { m ->
+                val out = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+                m.bounds = b; m.draw(Canvas(out))
+                return whiten(out)
+            }
+            d.foreground?.let { fg ->
+                val out = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+                fg.bounds = b; fg.draw(Canvas(out))
+                if (coverage(out) < 0.55f) return whiten(out)
+            }
+        }
+        return whiten(contrastMask(mask(fill(d))))
+    }
+
+    /** Fraction of the tile covered by opaque pixels. */
+    private fun coverage(b: Bitmap): Float {
+        val px = IntArray(size * size); b.getPixels(px, 0, size, 0, 0, size, size)
+        return px.count { (it ushr 24) > 128 }.toFloat() / px.size
+    }
+
+    /** Keeps pixels that differ from the icon's background colour (sampled near the edges). */
+    private fun contrastMask(src: Bitmap): Bitmap {
+        val px = IntArray(size * size); src.getPixels(px, 0, size, 0, 0, size, size)
+        val m = (size * 0.12f).toInt(); val c = size / 2; val e = size - 1 - m
+        val samples = listOf(c to m, c to e, m to c, e to c, m * 2 to m * 2, e - m to m * 2, m * 2 to e - m, e - m to e - m)
+            .map { (x, y) -> px[y * size + x] }.filter { (it ushr 24) > 128 }
+        if (samples.isEmpty()) return src
+        val br = samples.map { (it shr 16) and 0xFF }.sorted()[samples.size / 2]
+        val bg = samples.map { (it shr 8) and 0xFF }.sorted()[samples.size / 2]
+        val bb = samples.map { it and 0xFF }.sorted()[samples.size / 2]
+        for (i in px.indices) {
+            val p = px[i]; val a = p ushr 24
+            if (a == 0) continue
+            val dr = ((p shr 16) and 0xFF) - br; val dg = ((p shr 8) and 0xFF) - bg; val db = (p and 0xFF) - bb
+            val dist = kotlin.math.sqrt((dr * dr + dg * dg + db * db).toFloat())
+            val na = ((dist - 36f) * 2.4f).coerceIn(0f, 255f) * a / 255f
+            px[i] = (na.toInt() shl 24) or 0xFFFFFF
+        }
+        return Bitmap.createBitmap(px, size, size, Bitmap.Config.ARGB_8888)
+    }
+
+    private fun whiten(src: Bitmap): Bitmap {
+        val px = IntArray(size * size); src.getPixels(px, 0, size, 0, 0, size, size)
+        for (i in px.indices) px[i] = (px[i] and 0xFF000000.toInt()) or 0xFFFFFF
+        return Bitmap.createBitmap(px, size, size, Bitmap.Config.ARGB_8888)
+    }
 
     suspend fun load(entry: AppEntry): ImageBitmap {
         val key = keyFor(entry)

@@ -21,6 +21,8 @@ class LauncherApp : Application() {
     lateinit var icons: IconLoader; private set
     lateinit var wallpaper: WallpaperStore; private set
     lateinit var weather: WeatherRepository; private set
+    val controls by lazy { com.mrios.launcher.system.ControlCenterController(this) }
+    val media by lazy { com.mrios.launcher.system.MediaState(this) }
 
     override fun onCreate() {
         super.onCreate()

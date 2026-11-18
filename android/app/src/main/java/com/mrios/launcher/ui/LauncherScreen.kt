@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -64,6 +65,7 @@ import com.mrios.launcher.ui.components.AppIcon
 import com.mrios.launcher.ui.components.GlassContext
 import com.mrios.launcher.ui.components.LocalGlass
 import com.mrios.launcher.ui.components.drawWallpaper
+import com.mrios.launcher.ui.components.iconAppearance
 import com.mrios.launcher.ui.overlays.AppMenuOverlay
 import com.mrios.launcher.ui.overlays.FolderOverlay
 import com.mrios.launcher.ui.overlays.IconPickerSheet
@@ -78,6 +80,7 @@ import com.mrios.launcher.ui.overlays.RenameDialog
 import com.mrios.launcher.ui.overlays.SearchOverlay
 import com.mrios.launcher.ui.overlays.WallpaperPreviewOverlay
 import com.mrios.launcher.ui.overlays.byId
+import com.mrios.launcher.ui.overlays.popIn
 import com.mrios.launcher.ui.pages.DoneButton
 import com.mrios.launcher.ui.pages.Dock
 import com.mrios.launcher.ui.pages.GridGeom
@@ -265,7 +268,10 @@ fun LauncherScreen(vm: LauncherViewModel, activity: FragmentActivity) {
         }
     }
 
-    CompositionLocalProvider(LocalGlass provides GlassContext(settings.theme, wallpaper, rootSize)) {
+    CompositionLocalProvider(
+        LocalGlass provides GlassContext(settings.theme, wallpaper, rootSize),
+        com.mrios.launcher.ui.components.LocalIconAppearance provides settings.iconAppearance(),
+    ) {
         Box(Modifier.fillMaxSize().onSizeChanged { rootSize = it }) {
             // Wallpaper (Glass theme draws its own copy so panels can frost it; Transparent shows the system one).
             Box(Modifier.fillMaxSize().blur(blurRadius)) {
@@ -278,12 +284,20 @@ fun LauncherScreen(vm: LauncherViewModel, activity: FragmentActivity) {
                     beyondViewportPageCount = pageCount,
                     modifier = Modifier
                         .fillMaxSize()
-                        .pointerInput(settings.swipeDown, editMode, homeCount) {
+                        .pointerInput(settings.swipeDown, editMode, homeCount, settings.edgeNotifications, settings.edgeControlCenter) {
                             var total = 0f
+                            var start = Offset.Zero
+                            val topZone = statusTop.toPx() + 72.dp.toPx()
                             detectVerticalDragGestures(
-                                onDragStart = { total = 0f },
+                                onDragStart = { total = 0f; start = it },
                                 onVerticalDrag = { _, dy -> total += dy },
                                 onDragEnd = {
+                                    // iOS: pull down from the top-right for Control Centre, top-left for notifications.
+                                    if (!editMode && total > 80f && start.y < topZone) {
+                                        val right = start.x > size.width * 0.6f
+                                        if (right && settings.edgeControlCenter) { push(Overlay.ControlCenter); return@detectVerticalDragGestures }
+                                        if (!right && start.x < size.width * 0.45f && settings.edgeNotifications) { push(Overlay.NotificationCenter); return@detectVerticalDragGestures }
+                                    }
                                     val onHome = pagerState.currentPage in 1..homeCount
                                     if (onHome && !editMode && total > 120f) {
                                         if (settings.swipeDown == SwipeDownAction.SEARCH) push(Overlay.Search)
@@ -406,6 +420,7 @@ fun LauncherScreen(vm: LauncherViewModel, activity: FragmentActivity) {
                                 recreate = { activity.recreate() },
                                 unlock = { then -> unlockHidden(then) },
                                 changePin = { push(Overlay.Pin(PinMode.CREATE)) },
+                                openPanels = { com.mrios.launcher.system.PanelService.openSettings(context) },
                             ),
                         ) { close(o) }
                         is Overlay.WallpaperPreview -> WallpaperPreviewOverlay(o.bitmap, onApply = { both ->
@@ -418,12 +433,23 @@ fun LauncherScreen(vm: LauncherViewModel, activity: FragmentActivity) {
                             onDone = { h -> vm.updateSettings { it.copy(hiddenPinHash = h) } },
                             onSuccess = { pendingUnlock?.invoke(); pendingUnlock = null },
                         ) { close(o) }
+                        Overlay.ControlCenter, Overlay.NotificationCenter -> Box(Modifier.fillMaxSize()) {
+                            com.mrios.launcher.ui.components.FrostedBackdrop(true, dim = 0.3f)
+                            com.mrios.launcher.ui.panels.SystemPanel(
+                                kind = if (o == Overlay.ControlCenter) com.mrios.launcher.ui.panels.PanelKind.CONTROL_CENTER
+                                else com.mrios.launcher.ui.panels.PanelKind.NOTIFICATION_CENTER,
+                                insets = WindowInsets.systemBars.asPaddingValues(),
+                                onClose = { close(o) },
+                                modifier = Modifier.popIn(0.94f),
+                            )
+                        }
                         Overlay.Onboarding -> OnboardingOverlay(
                             OnboardingActions(
                                 setDefault = { SystemActions.requestDefaultLauncher(activity) },
                                 location = { requestLocation.launch(Manifest.permission.ACCESS_COARSE_LOCATION) },
                                 calendar = { requestCalendar.launch(Manifest.permission.READ_CALENDAR) },
                                 badges = { SystemActions.openNotificationAccess(context) },
+                                panels = { com.mrios.launcher.system.PanelService.openSettings(context) },
                             ),
                         ) {
                             vm.updateSettings { it.copy(onboardingDone = true) }

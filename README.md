@@ -12,6 +12,9 @@
   <img src="docs/screenshots/search.png" width="160" alt="Search">
   <img src="docs/screenshots/quick-actions.png" width="160" alt="Quick actions">
   <img src="docs/screenshots/settings.png" width="160" alt="Settings">
+  <img src="docs/screenshots/control-centre.png" width="160" alt="Control Centre">
+  <img src="docs/screenshots/notification-centre.png" width="160" alt="Notification Centre">
+  <img src="docs/screenshots/clear-icons.png" width="160" alt="Clear icon style">
 </p>
 
 ## Download
@@ -24,6 +27,9 @@ Get **`MRiOS-Launcher-vX.Y.apk`** from the [latest release](https://github.com/d
 ## Features
 
 - **Liquid-glass interface:** frosted panels, dock, menus and folders.
+- **Glass app icons:** four icon styles. *Glass* adds a specular sheen and rim. *Clear* shows a white glyph on frosted glass. *Tinted* shows a coloured glyph on dark glass. *Original* leaves icons unchanged.
+- **Control Centre:** swipe down from the top-right corner, in any app. It has connectivity status, music controls, brightness and volume sliders, rotation lock, silent mode, Focus (Do Not Disturb), torch and shortcuts.
+- **Notification Centre:** swipe down from the top-left corner, in any app. Notifications are stacked by app; tap a stack to expand it, swipe left to clear, or tap to open.
 - **App Library:** apps sorted into categories automatically, plus Suggestions, Recently Added and an A–Z search.
 - **Widgets:** clock, weather, calendar and battery, plus a Today view.
 - **Swipe-down search:** fuzzy app search, a calculator, and web or Play Store search.

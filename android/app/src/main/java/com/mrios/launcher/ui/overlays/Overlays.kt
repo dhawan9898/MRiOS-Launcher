@@ -53,6 +53,8 @@ sealed interface Overlay {
     data class WallpaperPreview(val bitmap: Bitmap) : Overlay
     data class Pin(val mode: PinMode) : Overlay
     data object Onboarding : Overlay
+    data object ControlCenter : Overlay
+    data object NotificationCenter : Overlay
 }
 
 /** Spring "pop" entrance used by all overlays. */

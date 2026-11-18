@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,6 +62,7 @@ class OnboardingActions(
     val location: () -> Unit,
     val calendar: () -> Unit,
     val badges: () -> Unit,
+    val panels: () -> Unit,
 )
 
 @Composable
@@ -87,6 +89,7 @@ fun OnboardingOverlay(actions: OnboardingActions, onFinish: () -> Unit) {
     val location = remember(lifecycleState) { context.launcherApp.weather.hasLocationPermission() }
     val calendar = remember(lifecycleState) { CalendarRepository.hasPermission(context) }
     val badges = remember(lifecycleState) { BadgeListenerService.isEnabled(context) }
+    val panels = remember(lifecycleState) { com.mrios.launcher.system.PanelService.isEnabled(context) }
 
     Box(Modifier.fillMaxSize()) {
         FrostedBackdrop(true, dim = 0.35f, modifier = Modifier.noRippleClick { }, cover = true)
@@ -110,6 +113,7 @@ fun OnboardingOverlay(actions: OnboardingActions, onFinish: () -> Unit) {
                 StepRow(Icons.Filled.NearMe, IOSColors.Blue, stringResource(R.string.onboard_location), location, actions.location)
                 StepRow(Icons.Filled.CalendarMonth, IOSColors.Red, stringResource(R.string.onboard_calendar), calendar, actions.calendar)
                 StepRow(Icons.Filled.Notifications, IOSColors.Orange, stringResource(R.string.onboard_badges), badges, actions.badges)
+                StepRow(Icons.Filled.Tune, Color(0xFF5E5CE6), stringResource(R.string.onboard_panels), panels, actions.panels)
             }
             Text(stringResource(R.string.onboard_hint), color = IOSColors.Secondary, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 12.dp))
         }

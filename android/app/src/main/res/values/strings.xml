@@ -154,4 +154,63 @@
 
     <string name="open_failed">Couldn’t open this app</string>
     <string name="toast_cannot_uninstall">System apps can’t be deleted</string>
+
+    <!-- Icon styles -->
+    <string name="icon_style">Icon Style</string>
+    <string name="icon_style_original">Original</string>
+    <string name="icon_style_glass">Glass</string>
+    <string name="icon_style_clear">Clear</string>
+    <string name="icon_style_tinted">Tinted</string>
+    <string name="icon_tint">Tint Colour</string>
+    <string name="tint_gold">Gold</string>
+    <string name="tint_blue">Blue</string>
+    <string name="tint_pink">Pink</string>
+    <string name="tint_green">Green</string>
+    <string name="tint_purple">Purple</string>
+    <string name="tint_white">White</string>
+
+    <!-- Control Centre & Notification Centre -->
+    <string name="sec_panels">Control Centre &amp; Notifications</string>
+    <string name="panels_all_apps">Use in All Apps</string>
+    <string name="panels_all_apps_desc">Swipe down from the top-right corner for Control Centre and the top-left for Notification Centre, in any app. On Android 13+, if the switch is greyed out, open App Info → ⋮ → Allow restricted settings first.</string>
+    <string name="notif_access">Notification Access</string>
+    <string name="notif_access_desc">For Notification Centre, music controls and badges</string>
+    <string name="write_settings_access">Brightness &amp; Rotation Control</string>
+    <string name="dnd_access">Focus (Do Not Disturb) Control</string>
+    <string name="access_granted">Allowed</string>
+    <string name="access_needed">Allow</string>
+    <string name="edge_notifications">Top-Left Swipe: Notification Centre</string>
+    <string name="edge_control">Top-Right Swipe: Control Centre</string>
+    <string name="onboard_panels">Control Centre in All Apps</string>
+    <string name="panel_service_label">MRiOS Control Centre</string>
+    <string name="panel_service_desc">Shows the MRiOS Control Centre and Notification Centre when you swipe down from the top corners of the screen in any app. This service does not read what is on your screen and collects no data.</string>
+    <string name="cc_airplane">Aeroplane Mode</string>
+    <string name="cc_cellular">Mobile Data</string>
+    <string name="cc_wifi">Wi-Fi</string>
+    <string name="cc_bluetooth">Bluetooth</string>
+    <string name="cc_not_playing">Not Playing</string>
+    <string name="cc_rotation">Rotation Lock</string>
+    <string name="cc_silent">Silent Mode</string>
+    <string name="cc_focus">Focus</string>
+    <string name="cc_focus_on">Do Not Disturb</string>
+    <string name="cc_flashlight">Torch</string>
+    <string name="cc_timer">Timer</string>
+    <string name="cc_calculator">Calculator</string>
+    <string name="cc_camera">Camera</string>
+    <string name="cc_mirroring">Screen Mirroring</string>
+    <string name="cc_alarm">Alarm</string>
+    <string name="cc_location">Location</string>
+    <string name="cc_brightness">Brightness</string>
+    <string name="cc_volume">Volume</string>
+    <string name="nc_title">Notification Centre</string>
+    <string name="nc_empty">No Older Notifications</string>
+    <string name="nc_access_title">See your notifications here</string>
+    <string name="nc_access_desc">Allow notification access to show notifications and music controls.</string>
+    <string name="nc_allow">Allow Access</string>
+    <string name="nc_clear">Clear</string>
+    <string name="nc_clear_all">Clear All</string>
+    <string name="nc_show_less">Show Less</string>
+    <string name="time_now">now</string>
+    <string name="time_minutes">%dm ago</string>
+    <string name="time_hours">%dh ago</string>
 </resources>
