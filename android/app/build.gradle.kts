@@ -16,8 +16,8 @@ android {
         minSdk = 26          // Android 8.0
         targetSdk = 35
         // CI passes these from the git tag (v3.1 -> "3.1") and the workflow run number.
-        versionCode = (project.findProperty("appVersionCode") as String?)?.toInt() ?: 3
-        versionName = (project.findProperty("appVersionName") as String?) ?: "3.0"
+        versionCode = (project.findProperty("appVersionCode") as String?)?.toInt() ?: 1
+        versionName = (project.findProperty("appVersionName") as String?) ?: "1.0"
         resourceConfigurations += listOf("en", "hi")
     }
 

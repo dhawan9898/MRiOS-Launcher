@@ -54,11 +54,11 @@ cd android
 **To publish a release:**
 
 ```bash
-git tag v3.1
-git push origin v3.1
+git tag v1.1
+git push origin v1.1
 ```
 
-The version name comes from the tag (`v3.1` → `3.1`). The version code increases with every run, so phones accept each release as an update. You can also go to **Actions → Release APK → Run workflow** and enter a tag.
+The version name comes from the tag (`v1.1` → `1.1`). The version code increases with every run, so phones accept each release as an update. You can also go to **Actions → Release APK → Run workflow** and enter a tag.
 
 **One-time setup:** the release workflow signs with your own key, stored as repository secrets. Phones only accept an update if it's signed with the same key as the installed version, so keep the keystore and password backed up.
 
