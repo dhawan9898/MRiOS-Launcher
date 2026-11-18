@@ -1,9 +1,0 @@
-{
-  "name": "MRiOS Launcher",
-  "description": "OS 27 MRiOS Liquid Glass launcher landing page with features, showcase, and APK download.",
-  "prompt": "MRiOS Launcher landing page",
-  "permissions": [],
-  "capabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}

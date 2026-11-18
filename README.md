@@ -1,60 +1,82 @@
-# MRiOS Glass Launcher
+# MRiOS Launcher
 
-**OS 27 Liquid Glass, on your Android.**
+**A liquid-glass, iPhone-style home screen for Android 8.0+.** No root needed.
 
-A smart, clean, and beautiful launcher inspired by the futuristic OS 27 Liquid Glass design — premium translucency, real depth effects, and buttery-smooth responsiveness for your daily home screen.
+[![Android CI](https://github.com/dhawan9898/MRiOS-Launcher/actions/workflows/android-ci.yml/badge.svg)](https://github.com/dhawan9898/MRiOS-Launcher/actions/workflows/android-ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/dhawan9898/MRiOS-Launcher?label=download)](https://github.com/dhawan9898/MRiOS-Launcher/releases/latest)
 
-🔗 **Live Page:** https://rakshittips.github.io/MRiOS-Launcher/
+<p>
+  <img src="docs/screenshots/home.png" width="160" alt="Home screen">
+  <img src="docs/screenshots/app-library.png" width="160" alt="App Library">
+  <img src="docs/screenshots/today.png" width="160" alt="Today view">
+  <img src="docs/screenshots/search.png" width="160" alt="Search">
+  <img src="docs/screenshots/quick-actions.png" width="160" alt="Quick actions">
+  <img src="docs/screenshots/settings.png" width="160" alt="Settings">
+</p>
 
----
+## Download
 
-## ✨ Features
+Get **`MRiOS-Launcher-vX.Y.apk`** from the [latest release](https://github.com/dhawan9898/MRiOS-Launcher/releases/latest). Each release also has a `.sha256` checksum file.
 
-- **Futuristic Liquid Glass Interface** — Translucent layers that react beautifully to your wallpaper, with premium glassmorphic depth and a clean, readable layout.
-- **Smart App Library** — Apps auto-sort into intuitive categories (Social, Games, Productivity, Utilities) so you can find any app in seconds.
-- **Custom Widgets & Themes** — Switch between Glass and Transparent themes, plus fully integrated Weather, Clock, and Calendar widgets.
-- **Swipe Down to Search** — Instant fuzzy search powered by a fast, lightweight indexer.
-- **Safe & Private Hidden Folder** — Keep sensitive apps out of sight with a secure hidden space.
-- **Effortless Personalization** — Rename apps, swap icons, and preview wallpapers in seconds.
+1. Open the APK on your phone. Allow "install unknown apps" for your browser or file manager if Android asks.
+2. Press **Home** and choose **MRiOS Launcher**, or tap "Set as Home App" on the welcome screen.
 
----
+## Features
 
-## 📱 Requirements
+- **Liquid-glass interface:** frosted panels, dock, menus and folders.
+- **App Library:** apps sorted into categories automatically, plus Suggestions, Recently Added and an A–Z search.
+- **Widgets:** clock, weather, calendar and battery, plus a Today view.
+- **Swipe-down search:** fuzzy app search, a calculator, and web or Play Store search.
+- **Hidden folder:** locked with fingerprint, face or screen lock, or with a PIN.
+- **Personalisation:** rename apps, change icons (photo or icon pack), wallpaper picker, grid size.
+- **Two themes:** Glass and Transparent.
+- **Languages:** English and Hindi.
+- **More:** jiggle edit mode with drag and drop, app shortcuts on long-press, notification badges.
 
-| | |
+More detail on using and building the app is in [`android/README.md`](android/README.md).
+
+## Development
+
+The app is in [`android/`](android/), built with Kotlin and Jetpack Compose.
+
+```bash
+cd android
+./gradlew assembleDebug        # → app/build/outputs/apk/debug/app-debug.apk
+```
+
+### CI/CD
+
+| Workflow | Runs on | Does |
+|---|---|---|
+| [Android CI](.github/workflows/android-ci.yml) | every push and pull request that touches `android/` | builds the debug APK, runs lint, and attaches both to the run |
+| [Release APK](.github/workflows/android-release.yml) | a pushed `v*` tag, or a manual run | builds a signed release APK and publishes it with a checksum on the [Releases page](https://github.com/dhawan9898/MRiOS-Launcher/releases) |
+
+**To publish a release:**
+
+```bash
+git tag v3.1
+git push origin v3.1
+```
+
+The version name comes from the tag (`v3.1` → `3.1`). The version code increases with every run, so phones accept each release as an update. You can also go to **Actions → Release APK → Run workflow** and enter a tag.
+
+**One-time setup:** the release workflow signs with your own key, stored as repository secrets. Phones only accept an update if it's signed with the same key as the installed version, so keep the keystore and password backed up.
+
+| Secret | Value |
 |---|---|
-| **Minimum OS** | Android 8.0+ |
-| **Install type** | No Root required |
-| **Themes included** | Glass / Transparent |
-| **Languages** | English, Hindi |
+| `MRIOS_KEYSTORE_BASE64` | `base64 -w0 your-release.jks` |
+| `MRIOS_KEYSTORE_PASSWORD` | keystore password |
+| `MRIOS_KEY_ALIAS` | key alias |
+| `MRIOS_KEY_PASSWORD` | key password |
 
----
+To create a keystore:
 
-## 📥 Download
+```bash
+keytool -genkeypair -keystore mrios-release.jks -alias mrios -keyalg RSA -keysize 4096 -validity 10000
+```
 
-Grab the latest APK from the [landing page](https://rakshittips.github.io/MRiOS-Launcher/) or the [Releases](../../releases) tab.
+## Credits
 
----
+Original MRiOS concept and branding by [Rakshittips](https://github.com/Rakshittips). Weather data from [Open-Meteo](https://open-meteo.com).
 
-## 🖼️ Screenshots
-
-Screenshots are available in [`/res`](https://rakshittips.github.io/MRiOS-Launcher/#showcase).
-
----
-
-## 🛠️ Built By
-
-**Rakshittips**
-
-- Telegram: https://t.me/Mr_Rakshit_2_0
-- YouTube: https://youtube.com/@mr._rakshit_2.0
-- Instagram: https://instagram.com/mr._rakshit_2.0
-- Portfolio: https://rakshittips.github.io/Rakshittips/index.html
-
-> Not affiliated with any official launcher app.
-
----
-
-## 📄 License
-
-This project is provided for personal use. Redistribution or reselling without credit is not permitted.
+Not affiliated with or endorsed by Apple Inc. No Apple fonts, icons or artwork are included.

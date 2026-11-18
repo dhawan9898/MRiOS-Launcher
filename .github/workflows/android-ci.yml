@@ -1,0 +1,53 @@
+# Builds and lints the app on every push and pull request.
+# The debug APK is attached to the run as an artifact for quick testing.
+name: Android CI
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["android/**", ".github/workflows/android-ci.yml"]
+  pull_request:
+    paths: ["android/**", ".github/workflows/android-ci.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build debug APK and run lint
+        run: ./gradlew assembleDebug lintDebug --no-daemon
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MRiOS-Launcher-debug-${{ github.sha }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report-${{ github.sha }}
+          path: android/app/build/reports/lint-results-debug.html
+          retention-days: 14

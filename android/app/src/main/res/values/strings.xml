@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">MRiOS Launcher</string>
+    <string name="settings_app_label">MRiOS Settings</string>
+    <string name="badge_service_label">MRiOS icon badges</string>
+
+    <!-- App Library -->
+    <string name="cat_suggestions">Suggestions</string>
+    <string name="cat_recent">Recently Added</string>
+    <string name="cat_social">Social</string>
+    <string name="cat_entertainment">Entertainment</string>
+    <string name="cat_games">Games</string>
+    <string name="cat_productivity">Productivity &amp; Finance</string>
+    <string name="cat_creativity">Creativity</string>
+    <string name="cat_info">Information &amp; Reading</string>
+    <string name="cat_shopping">Shopping &amp; Food</string>
+    <string name="cat_travel">Travel</string>
+    <string name="cat_health">Health &amp; Fitness</string>
+    <string name="cat_utilities">Utilities</string>
+    <string name="cat_other">Other</string>
+    <string name="cat_hidden">Hidden</string>
+    <string name="library_title">App Library</string>
+
+    <!-- Menus -->
+    <string name="menu_rename">Rename</string>
+    <string name="menu_change_icon">Change Icon</string>
+    <string name="menu_hide">Hide App</string>
+    <string name="menu_unhide">Unhide App</string>
+    <string name="menu_remove_home">Remove from Home Screen</string>
+    <string name="menu_add_home">Add to Home Screen</string>
+    <string name="menu_edit_home">Edit Home Screen</string>
+    <string name="menu_app_info">App Info</string>
+    <string name="menu_delete_app">Delete App</string>
+    <string name="menu_wallpaper">Change Wallpaper</string>
+    <string name="menu_settings">Launcher Settings</string>
+
+    <string name="done">Done</string>
+    <string name="edit">Edit</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="ok">OK</string>
+    <string name="allow">Allow</string>
+
+    <string name="remove_title">Remove “%1$s”?</string>
+    <string name="remove_message">Removing from Home Screen will keep the app in your App Library.</string>
+    <string name="rename_title">Rename App</string>
+    <string name="reset_name">Use Original Name</string>
+    <string name="icon_title">Change Icon</string>
+    <string name="icon_from_gallery">Choose from Photos</string>
+    <string name="icon_reset">Use Default Icon</string>
+    <string name="icon_no_pack">Install an icon pack from the Play Store to pick icons from it.</string>
+
+    <!-- Search -->
+    <string name="search_hint">Search</string>
+    <string name="search_apps">Apps</string>
+    <string name="search_top_hit">Top Hit</string>
+    <string name="search_web">Search the web for “%1$s”</string>
+    <string name="search_store">Search Play Store</string>
+    <string name="search_suggestions">Suggestions</string>
+    <string name="search_no_results">No Results</string>
+
+    <!-- Hidden -->
+    <string name="hidden_empty">No hidden apps. Long-press any app and choose Hide App.</string>
+    <string name="hidden_auth_title">Unlock Hidden Apps</string>
+    <string name="hidden_auth_sub">Confirm it’s you</string>
+    <string name="hidden_desc">Hidden apps are removed from the Home Screen, App Library and Search. Find them in the locked Hidden folder.</string>
+    <string name="pin_create">Create a PIN for Hidden Apps</string>
+    <string name="pin_enter">Enter PIN</string>
+    <string name="pin_wrong">Wrong PIN. Try again.</string>
+    <string name="pin_confirm">Confirm PIN</string>
+    <string name="pin_mismatch">PINs didn’t match. Try again.</string>
+
+    <!-- Widgets -->
+    <string name="widget_weather">Weather</string>
+    <string name="widget_clock">Clock</string>
+    <string name="widget_calendar">Calendar</string>
+    <string name="widget_battery">Batteries</string>
+    <string name="widget_none">None</string>
+    <string name="weather_loading">Loading…</string>
+    <string name="weather_unavailable">Unavailable. Tap to retry.</string>
+    <string name="weather_tap_setup">Tap to allow location</string>
+    <string name="weather_hl">H:%1$d° L:%2$d°</string>
+    <string name="weather_no_fix">Location unavailable. Tap to choose a city.</string>
+    <string name="weather_now">Now</string>
+    <string name="weather_current_location">My Location</string>
+    <string name="calendar_no_events">No more events today</string>
+    <string name="calendar_grant">Tap to show your events</string>
+    <string name="all_day">All-day</string>
+    <string name="battery_charging">Charging</string>
+    <string name="wc_clear">Clear</string>
+    <string name="wc_mostly_clear">Mostly Clear</string>
+    <string name="wc_partly_cloudy">Partly Cloudy</string>
+    <string name="wc_cloudy">Cloudy</string>
+    <string name="wc_fog">Foggy</string>
+    <string name="wc_drizzle">Drizzle</string>
+    <string name="wc_rain">Rain</string>
+    <string name="wc_snow">Snow</string>
+    <string name="wc_showers">Showers</string>
+    <string name="wc_thunder">Thunderstorms</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="sec_appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="theme_glass">Glass</string>
+    <string name="theme_transparent">Transparent</string>
+    <string name="wallpaper">Wallpaper</string>
+    <string name="wallpaper_reset">Use Default Wallpaper</string>
+    <string name="wallpaper_set_home">Set Home Screen</string>
+    <string name="wallpaper_set_both">Set Home &amp; Lock Screen</string>
+    <string name="icon_pack">Icon Pack</string>
+    <string name="icon_pack_none">System Icons</string>
+    <string name="get_icon_packs">Get icon packs from the Play Store</string>
+    <string name="show_labels">Show App Names</string>
+    <string name="sec_home">Home Screen</string>
+    <string name="grid_columns">Columns</string>
+    <string name="grid_rows">Rows</string>
+    <string name="home_widgets">Home Screen Widgets</string>
+    <string name="home_widgets_desc">Choose up to two widgets for the top of your first Home Screen page. All widgets are always on the Today view (swipe right).</string>
+    <string name="add_new_apps">Add New Apps to Home Screen</string>
+    <string name="swipe_down">Swipe Down Opens</string>
+    <string name="swipe_search">Search</string>
+    <string name="swipe_notifications">Notifications</string>
+    <string name="sec_widgets">Widgets</string>
+    <string name="weather_location">Weather Location</string>
+    <string name="use_my_location">My Location</string>
+    <string name="search_city">Search for a city</string>
+    <string name="temp_unit">Temperature</string>
+    <string name="celsius">Celsius</string>
+    <string name="fahrenheit">Fahrenheit</string>
+    <string name="sec_notifications">Notifications</string>
+    <string name="badges">App Icon Badges</string>
+    <string name="badges_desc">Shows unread counts on icons (needs notification access)</string>
+    <string name="sec_privacy">Privacy</string>
+    <string name="manage_hidden">Hidden Apps</string>
+    <string name="change_pin">Change Hidden Apps PIN</string>
+    <string name="sec_language">Language</string>
+    <string name="lang_system">System Default</string>
+    <string name="set_default">Set as Default Home App</string>
+    <string name="is_default">MRiOS is your Home App</string>
+    <string name="about">About</string>
+    <string name="version">Version %1$s</string>
+    <string name="credits">An Android launcher with a liquid-glass look. Not affiliated with or endorsed by Apple Inc. Weather data by Open-Meteo.com.</string>
+
+    <!-- Onboarding -->
+    <string name="onboard_title">Welcome to MRiOS</string>
+    <string name="onboard_sub">A liquid-glass Home Screen for Android</string>
+    <string name="onboard_default">Set as Home App</string>
+    <string name="onboard_location">Location for Weather</string>
+    <string name="onboard_calendar">Calendar for Events</string>
+    <string name="onboard_badges">Notification Badges</string>
+    <string name="onboard_hint">Everything is optional and can be changed later in Settings. Long-press empty space on the Home Screen for more options.</string>
+    <string name="onboard_continue">Continue</string>
+
+    <string name="open_failed">Couldn’t open this app</string>
+    <string name="toast_cannot_uninstall">System apps can’t be deleted</string>
+</resources>
